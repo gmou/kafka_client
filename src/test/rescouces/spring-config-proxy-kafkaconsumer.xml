@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:int="http://www.springframework.org/schema/integration"
+       xmlns:int-kafka="http://www.springframework.org/schema/integration/kafka"
+       xmlns:task="http://www.springframework.org/schema/task"
+       xsi:schemaLocation="http://www.springframework.org/schema/integration/kafka http://www.springframework.org/schema/integration/kafka/spring-integration-kafka.xsd
+		http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd">
+
+	<bean id="consumerConfig" class="kafka.consumer.ConsumerConfig">
+		<constructor-arg index="0">
+				<props>
+					<!-- zookeeper 注册地址 -->
+					<prop key="zookeeper.connect">123.56.113.51:2181</prop>
+					<!-- 消费系统所属分组，规范：公司.部门.项目  eg：xm.cb.wms -->
+					<prop key="group.id">group-1</prop>
+					<!-- ZooKeeper的最大超时时间，就是心跳的间隔，若是没有反映，那么认为已经死了，不易过大 -->
+					<prop key="zookeeper.session.timeout.ms">400</prop>
+					<!-- ZooKeeper集群中leader和follower之间的同步时间 -->
+					<prop key="zookeeper.sync.time.ms">200</prop>
+					<!-- 指定多久消费者更新offset到zookeeper中 -->
+					<prop key="auto.commit.interval.ms">1000</prop>
+				</props>
+		</constructor-arg>
+	</bean>
+	
+	<bean id="demo1Consumer" class="com.gmou.ikafka.consumer.KafkaConsumer" init-method="init">
+		<property name="topic" value="test" />
+		<!-- 每个threadNum表示一个Client消费者，其数量应该于该topic的partition数量相同 -->
+		<property name="threadNum" value="1" />
+		<property name="config" ref="consumerConfig" />
+		<property name="consumerLogic" ref="demo1ConsumerLogic" />
+	</bean>
+
+	<bean id="demo1ConsumerLogic" class="com.gmou.ikafka.test.consumer.Demo1ConsumerLogic"/>
+	
+	
+</beans>
